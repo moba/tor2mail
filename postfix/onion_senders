@@ -1,0 +1,3 @@
+# authenticated sender xyz.onion can use sender domain @xyz.onion.to 
+/@(.*).onion.to$/	$1.onion@onion.to
+/@(.*).onion$/		$1.onion@onion.to

@@ -1,0 +1,3 @@
+# abc@xyz.onion.to -> abc@xyz.onion
+/^(.*)@(.*).onion$/ $1@$2.onion
+/^(.*)@(.*).onion.to$/ $1@$2.onion

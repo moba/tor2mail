@@ -1,0 +1,3 @@
+# these domains are allow in From: from unauthenticated senders
+/(.*).onion$/		OK
+/(.*).onion.to$/ 	OK 

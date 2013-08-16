@@ -1,0 +1,66 @@
+myhostname = wendy.onion.to
+
+# for now, we limit the size of messages to 5 MB
+message_size_limit = 5242880
+
+# PGPmilter - reject non-PGP mail
+#smtpd_milters = unix:/milter/pgpmilter.sock
+#milter_default_action = tempfail
+
+# apart from local addresses, we accept @xyz.onion.to
+# and @xyz.onion from authenticated senders
+virtual_alias_domains = regexp:/etc/postfix/onion_domains 
+# ... and rewrite/forward @xyz.onion.to to @xyz.onion
+virtual_alias_maps = regexp:/etc/postfix/onion_rewrite_incoming
+
+# we want senders to authenticate
+smtpd_sasl_auth_enable = yes
+smtpd_sasl_type = cyrus
+broken_sasl_auth_clients = yes
+smtpd_sasl_authenticated_header = yes
+smtpd_sasl_security_options = noanonymous
+smtpd_sasl_local_domain = onion.to
+smtpd_recipient_restrictions = permit_mynetworks, reject_authenticated_sender_login_mismatch, permit_sasl_authenticated, reject_invalid_hostname, reject_non_fqdn_hostname, reject_unauth_destination
+# authenticated sender is only be allowed to use 
+# @username.onion.to or @username.onion 
+# as sender address: 
+smtpd_sender_login_maps = regexp:/etc/postfix/onion_senders
+
+# if sender address is @username.onion, we rewrite to 
+# @username.onion.to
+sender_canonical_maps = regexp:/etc/postfix/onion_rewrite_outgoing
+local_header_rewrite_clients = permit_sasl_authenticated
+
+# TLS parameters
+smtpd_use_tls=yes
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+smtpd_tls_received_header = yes
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+smtp_use_tls = yes
+smtp_tls_security_level = may
+smtpd_tls_cert_file = /etc/postfix/tls/smtpd.crt
+smtpd_tls_key_file = /etc/postfix/tls/smtpd.key
+smtpd_tls_CAfile = /etc/ssl/certs/ca-certificates.crt
+smtpd_tls_eccert_file = /etc/postfix/tls/smtpd-ecdsa.crt
+smtpd_tls_eckey_file = /etc/postfix/tls/smtpd-ecdsa.key
+smtpd_tls_dh1024_param_file = /etc/postfix/tls/dh_1024.pem
+smtpd_tls_dh512_param_file = /etc/postfix/tls/dh_512.pem
+smtpd_tls_eecdh_grade = strong
+
+smtpd_banner = $myhostname ESMTP NO UCE # removed info about postfix 
+biff = no
+
+append_dot_mydomain = no
+
+# Uncomment the next line to generate "delayed mail" warnings
+#delay_warning_time = 4h
+readme_directory = no
+
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+myorigin = /etc/mailname
+mydestination = $myhostname, localhost
+relayhost =
+mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128
+recipient_delimiter = +
+inet_interfaces = all
