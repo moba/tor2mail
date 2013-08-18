@@ -1,0 +1,8 @@
+/^(Received: from)[^\n]*(.*)/ REPLACE $1 [127.0.0.1] (localhost [127.0.0.1])$2
+/^User-Agent/        IGNORE
+/^X-Enigmail/        IGNORE
+/^X-Mailer/          IGNORE
+/^X-Originating-IP/  IGNORE
+/^((Resent-)?From|To|Cc|Date|Return-Path|Message-ID|Reply-To|Bcc):/ OK
+/^Subject: /	REPLACE Subject: Mail from Tor Hidden Service
+/./ IGNORE

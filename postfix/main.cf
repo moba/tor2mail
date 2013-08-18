@@ -7,6 +7,8 @@ message_size_limit = 5242880
 #smtpd_milters = unix:/milter/pgpmilter.sock
 #milter_default_action = tempfail
 
+header_checks = regexp:/etc/postfix/onion_anonymize_headers
+
 # apart from local addresses, we accept @xyz.onion.to
 # and @xyz.onion from authenticated senders
 virtual_alias_domains = regexp:/etc/postfix/onion_domains 
@@ -47,8 +49,17 @@ smtpd_tls_dh1024_param_file = /etc/postfix/tls/dh_1024.pem
 smtpd_tls_dh512_param_file = /etc/postfix/tls/dh_512.pem
 smtpd_tls_eecdh_grade = strong
 
-smtpd_banner = $myhostname ESMTP NO UCE # removed info about postfix 
-biff = no
+# i believe this will make a larger cache for recipient caching
+# (use on resourceful machines and for public gateways only)
+qmgr_message_recipient_limit = 50000
+default_recipient_limit = 50000
+
+# time between attempts to deliver a deferred message (default: 300s)
+minimal_backoff_time = 1000s
+# maximum time between attempts (default: 4000s)
+maximal_backoff_time = 5h 
+# time between deferred queue scans (default: 300s)
+queue_run_delay = 1000s
 
 append_dot_mydomain = no
 
